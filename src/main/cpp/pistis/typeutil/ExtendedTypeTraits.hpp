@@ -31,11 +31,54 @@ namespace pistis {
     template <typename T>
     struct IsBitCopyable< std::complex<T> > : public std::true_type { };
 
+    /** @brief Remove const, volatile and references from a type
+     *
+     *  Equivalent to combining std::remove_cv and std::remove_reference.
+     */
     template <typename T>
-    struct RemoveQualifiers :
+    struct RemoveCVR :
         public std::remove_cv<typename std::remove_reference<T>::type> {
       // Intentionally left blank
     };
+
+    /** @brief Remove const, volatile and references from a type
+     *
+     *  Equivalent to combining std::remove_cv and std::remove_reference.
+     *  @deprecated  Use RemoveCVR instead
+     */
+    template <typename T>
+    struct [[ deprecated("Use RemoveCVR instead")]] RemoveQualifiers :
+        public RemoveCVR<T> {
+    };
+
+    /** @brief True if T is a character type
+     *
+     *  The IsCharType metafunction recognizes the following built-in
+     *  types as character types: char, wchar_t char16_t and char32_t.
+     *  Because unsigned char and signed char are typically used to
+     *  represent signed and unsigned bytes respectively, IsCharType
+     *  does not consider them to be "characters."  Applications may add
+     *  additonal specializations.
+     */
+    template <typename T>
+    struct IsCharType : public std::false_type { };
+
+    template<>
+    struct IsCharType<char> : public std::true_type { };
+
+    template<>
+    struct IsCharType<wchar_t> : public std::true_type { };
+
+#ifdef __cpp_char8_t
+    template<>
+    struct IsCharType<char8_t> : public std::true_type { };
+#endif
+
+    template<>
+    struct IsCharType<char16_t> : public std::true_type { };
+
+    template<>
+    struct IsCharType<char32_t> : public std::true_type { };
 
   }
 }
